@@ -1,0 +1,14 @@
+*.gem
+.bundle
+pkg/*
+coverage/
+doc/
+.yardoc/
+log/*
+tmp/*
+!log/.gitignore
+!tmp/.gitignore
+lib/workers/server/log/
+lib/workers/server/tmp/
+test/tmp/
+test/monit/
