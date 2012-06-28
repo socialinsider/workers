@@ -1,0 +1,5 @@
+group :wikipedia_job do
+  gem 'curb'
+  gem 'yajl-ruby', require: 'yajl'
+  gem 'tire', '~> 0.4'
+end

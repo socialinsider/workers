@@ -1,0 +1,57 @@
+<div id="header" data-group="<%= @group %>">
+    <h2>
+    <%= @group.capitalize %>
+    <small>
+      <strong><span id="num-processes"><%= @processes.size %></span> workers running</strong>
+      /
+      <span id="num-pidfiles"><%= @num_pidfiles %></span> PID files
+      <span class="missing" <%= 'style="display:none"' if @num_missing < 1 %>>
+        /
+        <span id="num-missing"><%= @num_missing %></span> process missing
+      </span>
+    </small>
+    <span id="show-fetchers-toggler"><small><input type="checkbox" checked="checked"> Show fetchers?</small></span>
+    </h2>
+
+    <div id="stats">
+      <p class="total_success">
+        <span class="total"><span id="num-total"><%= @total %></span><small> total</small></span>
+        <span class="divider">/</span>
+        <span class="success"><span id="num-success"><%= @success %></span><small> succesfull</small></span>
+      </p>
+      <p class="ratio">
+        <span id="num-ratio" class="<%= ratio_to_class(@ratio) %>"><%= @ratio %></span><small> success rate</small></p>
+      <p style="float:none; clear:both; height: 0px; font-size: 9px"></p>
+    </div>
+    <div id="workers"></div>
+</div>
+
+
+<table>
+  <thead>
+    <tr>
+      <th>PID</th>
+      <th>RSS</th>
+      <th>CPU</th>
+      <th>MEM</th>
+      <th>ELAPSED</th>
+      <th>RATIO</th>
+      <th>Name</th>
+      <th>Command</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @processes.each do |p| %>
+    <tr id="pid_<%= p[:pid] %>" data-pid="<%= p[:pid] %>">
+      <td class="pid"><%= p[:pid] %></td>
+      <td><%= p[:rss] %></td>
+      <td><%= p[:cpu] %></td>
+      <td><%= p[:mem] %></td>
+      <td><%= p[:etime] %></td>
+      <td><%= p[:total] %>/<%= p[:success] %> (<%= p[:ratio] %>)</td>
+      <td><%= p[:name] %></td>
+      <td><%= p[:command][0..50] %>...</td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>

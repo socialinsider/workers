@@ -1,0 +1,98 @@
+.content {
+  margin-top: 0.5em;
+}
+
+#header h2 {
+  border-bottom: 1px solid #444;
+  position: relative;
+}
+#header h2 small .missing {
+  color: red !important;
+}
+
+#header #stats {
+  padding: 0.5em 0 0.5em 0;
+  margin-top: 1em;
+  border-bottom: 1px solid #ddd;
+  clear: both;
+}
+
+#header #stats p {
+  font-size: 48px !important;
+}
+
+#header #stats p.total_success {
+  margin-right: 1em !important;
+  float: left;
+}
+
+#header #stats p .divider {
+  font-size: 32px;
+  color: #878787;
+}
+
+#header #stats p .total {
+  color: #444;
+  font-size: 34px;
+}
+
+#header #stats p.ratio {
+  float: right;
+}
+
+#header #stats .ratio .high {
+  color: green;
+}
+
+#header #stats .ratio .mid {
+  color: orange;
+}
+
+#header #stats .ratio .low {
+  color: red;
+}
+
+#header #show-fetchers-toggler {
+  position: absolute;
+  right: 0.25em;
+}
+
+table {
+  border-bottom: 2px solid black;
+}
+
+table td {
+  position: relative;
+  line-height: 14px;
+  padding-top: 7px; padding-bottom: 7px;
+}
+
+td .tick {
+  position: absolute;
+  top: 0px; left: 0px;
+  width: 30px;
+  height: 100%;
+  z-index: -1;
+  display: none;
+  background: -webkit-linear-gradient(left, #fff, #83B2FB, #fff);
+}
+
+#workers {
+  background-color: #F0F0F0;
+  border-bottom: 1px solid #ddd;
+  clear: both;
+  height: 5px;
+}
+
+#workers .worker {
+  color: #fff;
+  background: #ddd;
+  width: 40px;
+  height: 5px;
+  float: left;
+  padding: 0;
+  margin: 0 1px 0 0;
+}
+#workers .worker:last-child {
+  margin-right: 0px;
+}

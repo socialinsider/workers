@@ -1,0 +1,22 @@
+# #########################################
+# Run me with `monit -v -I -c monitrc`
+# #########################################
+
+# ### !IMPORTANT! ######################################################
+# Depends on rbenv configuration in the `/etc/profile.d/rbenv.sh` file.
+# Example configuration:
+#
+#   # rbenv setup
+#   export HOME="/Users/$(whoami)"
+#   export PATH="$HOME/.rbenv/bin:/usr/local/bin/:$PATH"
+#   eval "$(/usr/local/bin/rbenv init -)"
+#
+# #####################################################################
+
+set daemon 5
+
+set httpd port 2812 and
+   use address localhost
+   allow localhost
+
+include ./monit/conf.d/**/*.monitrc

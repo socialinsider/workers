@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Workers</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link href="/bootstrap.min.css" rel="stylesheet">
+  <link href="/application.css" rel="stylesheet">
+  <script src="/jquery.1.7.1.min.js"></script>
+  <script src="/jquery.color.js"></script>
+  <script src="/application.js"></script>
+</head>
+<body data-server_url="<%= request.host %>:<%= request.port %>">
+  <div class="container">
+    <div class="content">
+      <%= yield %>
+    </div>
+  </div>
+</body>
+</html>
