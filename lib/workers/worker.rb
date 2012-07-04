@@ -117,8 +117,8 @@ module Workers
     #
     def launch group, collection, heartbeat, block
       collection.each do |item|
-        worker  group.to_s, item, heartbeat.to_i, block
-        monitrc group.to_s, item, heartbeat.to_i
+        Workers::Worker.worker  group.to_s, item, heartbeat.to_i, block
+        Workers::Worker.monitrc group.to_s, item, heartbeat.to_i
         sleep   (heartbeat.to_i*3)/collection.size.to_f
       end
     end
