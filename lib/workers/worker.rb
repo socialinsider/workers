@@ -62,11 +62,19 @@ module Workers
           exit!
         end
 
+        trap(:INT) { exit }
+
         loop do
           if pid = Process.fork
             Process.wait(pid)
           else
-            at_exit { __redis.srem "#{group}:workers:worker:#{Process.ppid}:children", Process.pid; exit! }
+            exit_procedure = lambda{ __log.("[fetcher] #{Process.pid} exiting..."); __redis.srem "#{group}:workers:worker:#{Process.ppid}:children", Process.pid; exit! }
+            at_exit    { exit_procedure.call }
+
+            # NOTE: Don't know why `at_exit` is not executed after `exit` method is called in `trap`
+            #
+            trap(:INT) { exit_procedure.call }
+
             __log.("[fetcher] for '#{name}' forked... [pid: #{Process.pid}] [worker: #{Process.ppid}] [#{Time.now}]")
             __procline.("[fetcher] worker: #{Process.ppid} [#{Time.now}]")
             __redis.publish "channels:fetchers", Process.ppid
