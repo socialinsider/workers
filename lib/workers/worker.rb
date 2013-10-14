@@ -38,10 +38,15 @@ module Workers
         Process.wait( Process.fork { File.delete  "#{ENV['WORKERS_PID_DIR']}/#{group}/#{name}.pid"; exit! } )
       }
 
+      # [master]
+      #
       if pid = Process.fork
         __create_worker_pid_file.(name, pid)
         __redis.lpush "#{group}:workers:workers", pid
         __redis.set   "#{group}:workers:worker:#{pid}", name
+
+      # [worker]
+      #
       else
         __log.("[worker] #{name} (#{group}) starting... [pid: #{Process.pid}] [parent: #{Process.ppid}] [#{Time.now}]", "")
         __procline.("[worker] name: #{name} [#{Time.now}]")
@@ -56,24 +61,39 @@ module Workers
 
           __redis.smembers("#{group}:workers:worker:#{Process.pid}:children").each do |child_pid|
             Process.kill('INT', child_pid.to_i) rescue nil
+
+            # Just to be sure because `block.call(item)` in [fetcher] can call `exit!`, so `at_exit` in [fetcher] wouldn't be called
+            #
+            __redis.srem("#{group}:workers:worker:#{Process.pid}:children", child_pid)
           end
           __redis.del "#{group}:workers:worker:#{Process.pid}:children"
 
           exit!
         end
 
-        trap(:INT) { exit }
+        [:INT, :TERM].each do |signal|
+          trap(signal) { exit }
+        end
 
         loop do
+          # [worker]
+          #
           if pid = Process.fork
             Process.wait(pid)
-          else
-            exit_procedure = lambda{ __log.("[fetcher] #{Process.pid} exiting..."); __redis.srem "#{group}:workers:worker:#{Process.ppid}:children", Process.pid; exit! }
-            at_exit    { exit_procedure.call }
 
-            # NOTE: Don't know why `at_exit` is not executed after `exit` method is called in `trap`
-            #
-            trap(:INT) { exit_procedure.call }
+          # [fetcher]
+          #
+          else
+            at_exit do
+              __log.("[fetcher] #{Process.pid} exiting...")
+              __redis.srem("#{group}:workers:worker:#{Process.ppid}:children", Process.pid)
+
+              exit!
+            end
+
+            [:INT, :TERM].each do |signal|
+              trap(signal) { exit }
+            end
 
             __log.("[fetcher] for '#{name}' forked... [pid: #{Process.pid}] [worker: #{Process.ppid}] [#{Time.now}]")
             __procline.("[fetcher] worker: #{Process.ppid} [#{Time.now}]")
@@ -90,7 +110,7 @@ module Workers
             __redis.incr "#{group}:jobs:accounts:#{name}:success"
             __redis.srem "#{group}:workers:worker:#{Process.ppid}:children", Process.pid
 
-            exit!
+            exit
           end
 
           sleep heartbeat
