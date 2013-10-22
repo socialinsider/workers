@@ -34,7 +34,7 @@ module Workers
       template =<<-TEMPLATE.gsub(/          /, '')
         check process worker-#{group}-#{name} with pidfile #{pidfile}
           #{ "every #{heartbeat.to_i/60} cycles" if heartbeat.to_i > 59 }
-          start program = "/bin/su - application -c 'source /etc/profile.d/rbenv.sh && cd #{app_dir} && bundle exec rake workers:start WORKERS_ACCOUNT=#{name} #{environment_variables} > #{app_dir}/log/#{group.downcase}-#{name.downcase}.log'" with timeout 10 seconds
+          start program = "/bin/su - application -c 'source /etc/profile.d/rbenv.sh && cd #{app_dir} && bundle exec rake workers:start WORKERS_NAME=#{name} #{environment_variables} > #{app_dir}/log/#{group.downcase}-#{name.downcase}.log'" with timeout 10 seconds
           stop program  = "/bin/bash -c 'kill $(cat #{pidfile})'"
           group workers-#{group}
         

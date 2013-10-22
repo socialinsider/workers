@@ -4,6 +4,7 @@ require File.expand_path('../../lib/workers', __FILE__)
 
 Bundler.require :wikipedia_job
 
+require 'tire'
 require 'tire/http/clients/curb'
 
 ES_URL = ENV['WORKERS_ES_URL'] || 'http://localhost:9200'

@@ -147,7 +147,7 @@ module Workers
       collection.each do |item|
         Workers::Worker.worker  group.to_s, item, heartbeat.to_i, block
         Workers::Worker.monitrc group.to_s, item, heartbeat.to_i
-        sleep   (heartbeat.to_i*3)/collection.size.to_f
+        sleep (ENV["LAUNCHER_SLEEP"] || (heartbeat.to_i*3)/collection.size.to_f).to_i
       end
     end
 

@@ -5,6 +5,9 @@
 $LOAD_PATH.unshift File.expand_path('..', __FILE__)
 require 'wikipedia_job'
 
+JOBCLASS = WikipediaJob
+ENV["WORKERS_JOBCLASS"] = JOBCLASS.to_s
+
 accounts = [
   { name: 'one',   data: 'ABC'},
   { name: 'two',   data: 'DEF'},
@@ -15,5 +18,5 @@ COUNT = (ENV['WORKERS_COUNT'] || 3).to_i
 accounts = (1..COUNT).to_a.map { |i| sprintf('%03d', i) }
 
 Workers::launch :wikipedia_job, accounts, ENV['WORKERS_HEARTBEAT'].to_i, lambda { |payload|
-  WikipediaJob.perform(payload)
+  JOBCLASS.perform(payload)
 }

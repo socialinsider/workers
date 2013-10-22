@@ -6,7 +6,7 @@
 #
 # To launch single worker, run me with:
 #
-#     $ rake workers:start WORKERS_JOBPATH=some/path WORKERS_JOBCLASS=MyWorkerClass WORKERS_ACCOUNT=test WORKERS_HEARTBEAT=300
+#     $ rake workers:start WORKERS_JOBPATH=some/path WORKERS_JOBCLASS=MyWorkerClass WORKERS_NAME=test WORKERS_HEARTBEAT=300
 #
 # The tasks create PID files in the directory specified as the `WORKERS_PID_DIR` environment
 # variable, by default in the `$CWD/pids`.
@@ -15,7 +15,7 @@
 # specified as the `WORKERS_MONITRC_DIR` environment variable, by default in `$CWD/monit/conf.d/`.
 #
 # Run the tasks with the `WORKERS_DEBUG` environment variable set to `true` to see job output.
-# Set the `DEBUG` variable to `verbose` to see debugging output.
+# Set the `WORKERS_DEBUG` variable to `verbose` to see debugging output.
 
 # encoding: UTF-8
 
@@ -76,38 +76,40 @@ namespace :workers do
   end
 
   desc "Launch single worker. Pass path to job class as the WORKERS_JOBCLASS environment variable and " +
-       "the account ID as the WORKERS_ACCOUNT environment variable. Pass the path to directory containing PID files as " +
+       "the name as the WORKERS_NAME environment variable. Pass the path to directory containing PID files as " +
         "the WORKERS_PID_DIR environment variable, and the path to the directory containing Monit configuration files " +
         "as the WORKERS_MONITRC_DIR environment variable."
   task :start do
     raise ArgumentError, "You must pass a job class name as the WORKERS_JOBCLASS environment variable" unless ENV['WORKERS_JOBCLASS']
-    raise ArgumentError, "You must pass an account ID as the WORKERS_ACCOUNT environment variable." unless ENV['WORKERS_ACCOUNT']
-    raise ArgumentError, "You must pass a group name as WORKERS_GROUP environment variable" unless ENV['WORKERS_GROUP']
+    raise ArgumentError, "You must pass an account ID as the WORKERS_NAME environment variable."    unless ENV['WORKERS_NAME']
+    raise ArgumentError, "You must pass a group name as WORKERS_GROUP environment variable"            unless ENV['WORKERS_GROUP']
 
     require 'active_support/inflector'
 
-    group       = ENV['WORKERS_GROUP']
-    account_id  = ENV['WORKERS_ACCOUNT']
-    ENV['WORKERS_JOB_PATH'] ||= Dir.pwd
+    group                    = ENV['WORKERS_GROUP']
+    name                     = ENV['WORKERS_NAME']
+    ENV['WORKERS_JOBPATH'] ||= Dir.pwd
 
-    puts "[launcher] starting for #{account_id} in group #{group}... (pid: #{Process.pid})", ""
+    puts "[launcher] starting #{name} in group #{group}... (pid: #{Process.pid})", ""
     $0=$PROCESS_NAME="[launcher] (Started at #{Time.now})"
 
-    require File.join(ENV['WORKERS_JOB_PATH'], ENV['WORKERS_JOBCLASS'].demodulize.underscore)
+    require File.join(ENV['WORKERS_JOBPATH'], ENV['WORKERS_JOBCLASS'].demodulize.underscore)
 
     Workers::worker group,
-                              { name: account_id, account_id: account_id },
-                              ENV['WORKERS_HEARTBEAT'].to_i,
-                              lambda { |payload| ENV['WORKERS_JOBCLASS'].constantize.perform(payload) }
-    Workers::monitrc group, {name: account_id}, ENV['WORKERS_HEARTBEAT'].to_i
+                    { name: name },
+                    ENV['WORKERS_HEARTBEAT'].to_i,
+                    lambda { |payload| ENV['WORKERS_JOBCLASS'].constantize.perform(payload) }
+    Workers::monitrc group,
+                     {name: name},
+                     ENV['WORKERS_HEARTBEAT'].to_i
   end
 
-  desc "Terminate single worker in specific group. Pass an account ID as the WORKERS_ACCOUNT environment variable " +
+  desc "Terminate single worker in specific group. Pass a name as the WORKERS_NAME environment variable " +
        "and the group name as the WORKERS_GROUP environment variable."
   task :stop do
-    raise ArgumentError, "You must pass an account ID as the WORKERS_ACCOUNT environment variable." unless ENV['WORKERS_ACCOUNT']
-    raise ArgumentError, "You must pass a group name as the WORKERS_GROUP environment variable." unless ENV['WORKERS_GROUP']
-    filename = "#{ENV['WORKERS_PID_DIR']}/#{ENV['WORKERS_GROUP']}/#{ENV['WORKERS_ACCOUNT']}.pid"
+    raise ArgumentError, "You must pass an account ID as the WORKERS_NAME environment variable." unless ENV['WORKERS_NAME']
+    raise ArgumentError, "You must pass a group name as the WORKERS_GROUP environment variable."    unless ENV['WORKERS_GROUP']
+    filename = "#{ENV['WORKERS_PID_DIR']}/#{ENV['WORKERS_GROUP']}/#{ENV['WORKERS_NAME']}.pid"
 
     begin
       pid = File.read(filename).strip

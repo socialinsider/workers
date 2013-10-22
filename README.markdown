@@ -52,9 +52,9 @@ To launch 3 concurrent workers, run this _Rake_ task in the main project directo
     rake workers:start_all WORKERS_LAUNCHER=./test/launcher.rb \
                            WORKERS_PID_DIR=./test/tmp/pids \
                            WORKERS_MONITRC_DIR=./test/tmp/monit \
+                           WORKERS_JOBPATH=./test/ \
                            WORKERS_GROUP=wikipedia_job \
-                           WORKERS_HEARTBEAT=10 \
-                           WORKERS_DEBUG=true
+                           WORKERS_HEARTBEAT=10
 
 To stop these workers, run this _Rake_ task:
 
@@ -70,13 +70,13 @@ To launch a single worker, run this _Rake_ task in the main project directory:
                        WORKERS_PID_DIR=./test/tmp/pids/ \
                        WORKERS_JOB_PATH=./test/ \
                        WORKERS_JOBCLASS=WikipediaJob \
-                       WORKERS_ACCOUNT=test \
+                       WORKERS_NAME=test \
                        WORKERS_HEARTBEAT=10 \
                        WORKERS_DEBUG=true
 
 To stop this worker, run this Rake script:
 
-    rake workers:stop WORKERS_PID_DIR=./test/tmp/pids WORKERS_ACCOUNT=test WORKERS_GROUP=wikipedia_job
+    rake workers:stop WORKERS_PID_DIR=./test/tmp/pids WORKERS_NAME=test WORKERS_GROUP=wikipedia_job
 
 ## The Web GUI ##
 
