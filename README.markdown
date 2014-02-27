@@ -101,4 +101,4 @@ with the following command:
 
 ----
 
-(c) 2012 Ataxo Interactive, s.r.o.
+(c) 2014 Social Insider, s.r.o.
